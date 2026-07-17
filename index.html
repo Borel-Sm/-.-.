@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Janet Silva - Gestão</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f7f3f0; --surface: #ffffff; --card: #ffffff; --card-hover: #fdf8f5;
+      --border: #e8ddd6; --accent: #c9907a; --accent-light: #e8b4a3;
+      --accent-dim: rgba(201,144,122,0.12); --text: #3d2e27; --text-muted: #8a7068;
+      --text-dim: #b8a89e; --green: #7aaa82; --green-dim: rgba(122,170,130,0.13);
+      --red: #c07070; --red-dim: rgba(192,112,112,0.12); --blue: #7a9fc0;
+      --blue-dim: rgba(122,159,192,0.12); --purple: #a87eb8;
+      --purple-dim: rgba(168,126,184,0.12); --rose: #d4889a;
+      --rose-dim: rgba(212,136,154,0.12); --gold: #c8a060;
+      --gold-dim: rgba(200,160,96,0.12); --teal: #6aabb0;
+      --teal-dim: rgba(106,171,176,0.12);
+    }
+    body { font-family: 'Lato', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* TOPBAR */
+    .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 20px 0; position: sticky; top: 0; z-index: 10; box-shadow: 0 1px 8px rgba(61,46,39,0.07); }
+    .topbar-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .brand-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--accent); letter-spacing: 0.02em; }
+    .brand-sub { font-size: 10px; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
+    .nav { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; }
+    .nav::-webkit-scrollbar { display: none; }
+    .nav-item { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px 8px 0 0; cursor: pointer; font-size: 14px; color: var(--text-muted); transition: all 0.18s; border: 1px solid transparent; border-bottom: none; font-family: 'Lato', sans-serif; background: none; white-space: nowrap; }
+    .nav-item:hover { background: var(--accent-dim); color: var(--text); }
+    .nav-item.active { background: var(--bg); color: var(--accent); border-color: var(--border); border-bottom-color: var(--bg); font-weight: 600; }
+
+    /* MAIN */
+    .main { padding: 24px 16px; max-width: 960px; width: 100%; margin: 0 auto; }
+    .page { display: none; }
+    .page.active { display: block; }
+    .page-header { margin-bottom: 22px; }
+    .page-title { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: var(--text); }
+    .page-subtitle { font-size: 14px; color: var(--text-muted); margin-top: 4px; }
+
+    /* CARDS */
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px 18px; margin-bottom: 16px; box-shadow: 0 2px 10px rgba(61,46,39,0.05); }
+    .card-title { font-family: 'Playfair Display', serif; font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 12px; }
+
+    /* STAT GRID */
+    .stat-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+    .stat-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+    .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; position: relative; overflow: hidden; box-shadow: 0 2px 8px rgba(61,46,39,0.05); }
+    .stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; border-radius: 14px 14px 0 0; }
+    .stat-card.accent::before  { background: linear-gradient(90deg, var(--accent), transparent); }
+    .stat-card.green::before   { background: linear-gradient(90deg, var(--green), transparent); }
+    .stat-card.red::before     { background: linear-gradient(90deg, var(--red), transparent); }
+    .stat-card.blue::before    { background: linear-gradient(90deg, var(--blue), transparent); }
+    .stat-card.purple::before  { background: linear-gradient(90deg, var(--purple), transparent); }
+    .stat-card.rose::before    { background: linear-gradient(90deg, var(--rose), transparent); }
+    .stat-card.gold::before    { background: linear-gradient(90deg, var(--gold), transparent); }
+    .stat-card.teal::before    { background: linear-gradient(90deg, var(--teal), transparent); }
+    .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); margin-bottom: 6px; font-weight: 700; }
+    .stat-value { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; }
+    .stat-sub { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+    .stat-icon { position: absolute; top: 12px; right: 12px; font-size: 20px; opacity: 0.15; }
+
+    /* TABELAS */
+    .table-wrap { overflow-x: auto; margin-top: 8px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th { text-align: left; padding: 8px 10px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); border-bottom: 1px solid var(--border); font-weight: 700; white-space: nowrap; }
+    tbody tr { border-bottom: 1px solid rgba(232,221,214,0.6); transition: background 0.15s; }
+    tbody tr:hover { background: var(--card-hover); }
+    tbody td { padding: 10px; color: var(--text); vertical-align: middle; }
+
+    /* BADGES */
+    .badge { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .badge-green  { background: var(--green-dim);  color: var(--green); }
+    .badge-amber  { background: var(--accent-dim); color: var(--accent); }
+    .badge-red    { background: var(--red-dim);    color: var(--red); }
+    .badge-blue   { background: var(--blue-dim);   color: var(--blue); }
+    .badge-purple { background: var(--purple-dim); color: var(--purple); }
+    .badge-rose   { background: var(--rose-dim);   color: var(--rose); }
+    .badge-gold   { background: var(--gold-dim);   color: var(--gold); }
+    .badge-teal   { background: var(--teal-dim);   color: var(--teal); }
+
+    /* FORMULÁRIOS */
+    .form-stack { display: flex; flex-direction: column; gap: 12px; }
+    .field { display: flex; flex-direction: column; gap: 5px; position: relative; }
+    label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); font-weight: 700; }
+    input, select, textarea { background: #faf7f5; border: 1px solid var(--border); border-radius: 10px; padding: 10px 13px; font-size: 15px; color: var(--text); font-family: 'Lato', sans-serif; outline: none; transition: border 0.18s, box-shadow 0.18s; width: 100%; }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(201,144,122,0.12); }
+    select option { background: #ffffff; }
+    textarea { resize: vertical; min-height: 70px; }
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+    /* AUTOCOMPLETE CLIENTE */
+    .cliente-wrap { position: relative; }
+    .cliente-suggestions {
+      position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+      background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+      box-shadow: 0 6px 24px rgba(61,46,39,0.13); z-index: 50; overflow: hidden;
+      display: none;
+    }
+    .cliente-suggestions.show { display: block; }
+    .suggestion-item {
+      display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+      cursor: pointer; transition: background 0.13s; border-bottom: 1px solid rgba(232,221,214,0.5);
+    }
+    .suggestion-item:last-child { border-bottom: none; }
+    .suggestion-item:hover { background: var(--accent-dim); }
+    .suggestion-avatar {
+      width: 32px; height: 32px; border-radius: 50%; background: var(--accent-dim);
+      border: 1.5px solid var(--accent-light); display: flex; align-items: center;
+      justify-content: center; font-family: 'Playfair Display', serif; font-size: 13px;
+      font-weight: 700; color: var(--accent); flex-shrink: 0;
+    }
+    .suggestion-info { flex: 1; min-width: 0; }
+    .suggestion-name { font-weight: 700; font-size: 14px; color: var(--text); }
+    .suggestion-meta { font-size: 11px; color: var(--text-muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .suggestion-use { font-size: 11px; color: var(--accent); font-weight: 700; background: var(--accent-dim); padding: 3px 8px; border-radius: 6px; white-space: nowrap; }
+
+    /* BUTTONS */
+    .btn { padding: 12px 20px; border-radius: 10px; border: none; cursor: pointer; font-family: 'Lato', sans-serif; font-size: 15px; font-weight: 700; transition: all 0.18s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; width: 100%; }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), #b87060); color: #fff; box-shadow: 0 3px 14px rgba(201,144,122,0.35); }
+    .btn-primary:hover { filter: brightness(1.08); transform: translateY(-1px); box-shadow: 0 5px 18px rgba(201,144,122,0.45); }
+    .btn-danger { background: var(--red-dim); color: var(--red); border: 1px solid rgba(192,112,112,0.2); padding: 6px 10px; font-size: 12px; width: auto; border-radius: 8px; cursor: pointer; font-family: 'Lato', sans-serif; font-weight: 700; transition: all 0.18s; }
+    .btn-danger:hover { background: rgba(192,112,112,0.22); }
+    .btn-success { background: var(--green-dim); color: var(--green); border: 1px solid rgba(122,170,130,0.25); padding: 6px 10px; font-size: 12px; width: auto; font-family: 'Lato', sans-serif; font-weight: 700; cursor: pointer; border-radius: 8px; transition: all 0.18s; }
+    .btn-success:hover { background: rgba(122,170,130,0.22); }
+    .btn-clear { background: rgba(192,112,112,0.08); color: var(--red); border: 1px solid rgba(192,112,112,0.2); padding: 8px 14px; font-size: 12px; width: auto; font-family: 'Lato', sans-serif; font-weight: 700; cursor: pointer; border-radius: 8px; transition: all 0.18s; display: inline-flex; align-items: center; gap: 5px; }
+    .btn-clear:hover { background: rgba(192,112,112,0.18); }
+    .section-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+    .divider { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
+    .empty-state { text-align: center; padding: 32px; color: var(--text-dim); font-size: 14px; }
+    .empty-icon { font-size: 30px; margin-bottom: 8px; opacity: 0.5; }
+
+    /* ALERTS */
+    .alert { padding: 10px 14px; border-radius: 10px; font-size: 14px; margin-bottom: 12px; }
+    .alert-success { background: var(--green-dim); color: #4a8a55; border: 1px solid rgba(122,170,130,0.3); }
+    .alert-error   { background: var(--red-dim);   color: var(--red); border: 1px solid rgba(192,112,112,0.25); }
+
+    /* PREVIEW BOX */
+    .preview-box { font-size: 13px; color: var(--text-muted); padding: 12px 14px; background: #fdf9f7; border-radius: 10px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 5px; }
+    .prow { display: flex; justify-content: space-between; align-items: center; }
+    .prow.total { border-top: 1px solid var(--border); margin-top: 4px; padding-top: 6px; font-weight: 700; font-size: 14px; }
+    .hidden { display: none !important; }
+
+    /* PROGRESS */
+    .prog-wrap { background: rgba(232,221,214,0.5); border-radius: 4px; height: 6px; overflow: hidden; margin-top: 6px; }
+    .prog-bar { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--green), #5d9a6a); transition: width 0.4s ease; }
+
+    /* CHART */
+    .chart-area { display: flex; align-items: flex-end; gap: 8px; height: 100px; margin-top: 10px; }
+    .chart-col { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+    .chart-col-bars { display: flex; gap: 3px; align-items: flex-end; height: 80px; }
+    .chart-bar { width: 14px; border-radius: 3px 3px 0 0; cursor: default; position: relative; transition: opacity 0.2s; }
+    .chart-bar:hover::after { content: attr(data-val); position: absolute; bottom: calc(100% + 4px); left: 50%; transform: translateX(-50%); background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 2px 6px; font-size: 10px; white-space: nowrap; color: var(--text); pointer-events: none; z-index: 5; box-shadow: 0 2px 8px rgba(61,46,39,0.1); }
+    .chart-lbl { font-size: 10px; color: var(--text-muted); }
+    .legend { display: flex; gap: 14px; margin-top: 8px; font-size: 11px; color: var(--text-muted); }
+    .legend-dot { width: 10px; height: 10px; border-radius: 2px; display: inline-block; margin-right: 4px; }
+
+    /* FIADO */
+    .fiado-status-pago     { background: var(--green-dim);  color: var(--green);  border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
+    .fiado-status-pendente { background: var(--purple-dim); color: var(--purple); border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
+    .fiado-status-atrasado { background: var(--red-dim);    color: var(--red);    border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
+
+    /* PARCELAMENTO */
+    .parcela-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px,1fr)); gap: 8px; margin-top: 6px; }
+    .parcela-option { background: #faf7f5; border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; cursor: pointer; transition: all 0.18s; text-align: center; }
+    .parcela-option:hover { border-color: var(--accent); background: var(--accent-dim); }
+    .parcela-option.selected { border-color: var(--accent); background: var(--accent-dim); box-shadow: 0 0 0 1px var(--accent); }
+    .parcela-num { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--accent); }
+    .parcela-val { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .parcela-preview { background: #faf7f5; border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; margin-top: 8px; }
+    .parcela-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid rgba(232,221,214,0.5); font-size: 13px; }
+    .parcela-row:last-child { border-bottom: none; }
+    .parcela-num-badge { font-size: 10px; background: var(--accent-dim); color: var(--accent); border-radius: 4px; padding: 1px 6px; font-weight: 700; margin-right: 6px; }
+    .installment-badge { background: var(--gold-dim); color: var(--gold); border-radius: 4px; padding: 2px 7px; font-size: 11px; font-weight: 700; }
+
+    /* TOGGLE FIADO */
+    .toggle-row { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #faf7f5; border: 1px solid var(--border); border-radius: 10px; cursor: pointer; user-select: none; }
+    .toggle-switch { width: 36px; height: 20px; background: var(--border); border-radius: 10px; position: relative; transition: background 0.2s; flex-shrink: 0; }
+    .toggle-switch.on { background: var(--rose); }
+    .toggle-switch::after { content:''; position: absolute; top: 3px; left: 3px; width: 14px; height: 14px; border-radius: 50%; background: #fff; transition: left 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+    .toggle-switch.on::after { left: 19px; }
+    .toggle-label { font-size: 13px; color: var(--text-muted); }
+    .toggle-label strong { color: var(--rose); }
+
+    /* CLIENTES */
+    .client-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 12px; overflow: hidden; transition: border-color 0.2s, box-shadow 0.2s; box-shadow: 0 2px 8px rgba(61,46,39,0.04); }
+    .client-card:hover { border-color: var(--accent-light); box-shadow: 0 4px 16px rgba(61,46,39,0.08); }
+    .client-card-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; cursor: pointer; }
+    .client-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-dim), #faf7f5); border: 2px solid var(--accent-light); display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; color: var(--accent); flex-shrink: 0; }
+    .client-info { flex: 1; margin-left: 12px; }
+    .client-name { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; color: var(--text); }
+    .client-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .client-stats { display: flex; gap: 16px; text-align: right; flex-shrink: 0; }
+    .client-stat-val { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 700; }
+    .client-stat-lbl { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; }
+    .client-expand { color: var(--text-dim); font-size: 16px; margin-left: 12px; transition: transform 0.2s; }
+    .client-card.open .client-expand { transform: rotate(90deg); }
+    .client-body { display: none; padding: 0 16px 14px; border-top: 1px solid var(--border); }
+    .client-card.open .client-body { display: block; }
+    .client-section-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); margin: 12px 0 6px; font-weight: 700; }
+
+    /* TOAST */
+    .toast { position: fixed; bottom: 86px; right: 20px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 10px 16px; font-size: 13px; color: var(--text); z-index: 300; max-width: 280px; box-shadow: 0 6px 24px rgba(61,46,39,0.15); transform: translateY(0); opacity: 1; transition: all 0.3s; }
+    .toast.hide { transform: translateY(10px); opacity: 0; }
+
+    /* CALCULADORA */
+    .calc-fab { position: fixed; bottom: 24px; right: 20px; width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), #b87060); border: none; cursor: pointer; font-size: 22px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(201,144,122,0.45); z-index: 100; transition: transform 0.2s, box-shadow 0.2s; }
+    .calc-fab:hover { transform: scale(1.1); box-shadow: 0 6px 28px rgba(201,144,122,0.6); }
+    .calc-overlay { position: fixed; inset: 0; background: rgba(61,46,39,0.3); z-index: 200; display: none; align-items: flex-end; justify-content: flex-end; padding: 24px 20px; }
+    .calc-overlay.open { display: flex; }
+    .calc-panel { background: var(--card); border: 1px solid var(--border); border-radius: 18px; width: 280px; overflow: hidden; box-shadow: 0 16px 48px rgba(61,46,39,0.18); animation: calcSlide 0.22s ease; }
+    @keyframes calcSlide { from { opacity:0; transform: translateY(20px) scale(0.95); } to { opacity:1; transform: none; } }
+    .calc-screen { background: #faf7f5; padding: 14px 16px; min-height: 72px; text-align: right; border-bottom: 1px solid var(--border); }
+    .calc-expr { font-size: 12px; color: var(--text-dim); min-height: 16px; word-break: break-all; }
+    .calc-val { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--text); font-weight: 700; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); }
+    .calc-btn { background: var(--card); padding: 0; height: 56px; border: none; cursor: pointer; font-size: 16px; color: var(--text); transition: background 0.12s; display: flex; align-items: center; justify-content: center; }
+    .calc-btn:hover { background: var(--card-hover); }
+    .calc-btn:active { background: var(--accent-dim); }
+    .calc-btn.op  { color: var(--accent); font-weight: 700; }
+    .calc-btn.eq  { background: linear-gradient(135deg, var(--accent), #b87060); color: #fff; font-size: 20px; }
+    .calc-btn.eq:hover { filter: brightness(1.08); }
+    .calc-btn.clr { color: var(--red); }
+    .calc-btn.span2 { grid-column: span 2; }
+    .calc-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px 8px; }
+    .calc-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 700; }
+    .calc-close { background: none; border: none; cursor: pointer; color: var(--text-dim); font-size: 18px; line-height: 1; padding: 2px 4px; }
+    .calc-close:hover { color: var(--text); }
+
+    /* SERVIÇO BADGES */
+    .srv-designer  { background: rgba(168,126,184,0.12); color: var(--purple); border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
+    .srv-henna     { background: rgba(200,160,96,0.13);  color: var(--gold);   border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
+    .srv-micropig  { background: rgba(212,136,154,0.13); color: var(--rose);   border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
+    .srv-depilacao { background: rgba(201,144,122,0.14); color: var(--accent); border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
+    .srv-cilios    { background: rgba(106,171,176,0.13); color: var(--teal);   border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
+    .srv-massagem  { background: rgba(122,170,130,0.14); color: var(--green);  border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
+
+    /* STATUS AGENDAMENTO */
+    .ag-status-agendado   { background: var(--blue-dim);   color: var(--blue);   border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
+    .ag-status-confirmado { background: var(--green-dim);  color: var(--green);  border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
+    .ag-status-concluido  { background: var(--teal-dim);   color: var(--teal);   border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
+    .ag-status-cancelado  { background: var(--red-dim);    color: var(--red);    border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
+
+    @media (max-width: 600px) {
+      .stat-grid-4 { grid-template-columns: repeat(2, 1fr); }
+      .stat-grid-3 { grid-template-columns: repeat(2, 1fr); }
+      .row-2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- CALCULADORA FAB -->
+<button class="calc-fab" onclick="toggleCalc()" title="Calculadora">🧮</button>
+
+<!-- OVERLAY CALCULADORA -->
+<div class="calc-overlay" id="calc-overlay" onclick="closeCalcOutside(event)">
+  <div class="calc-panel" onclick="event.stopPropagation()">
+    <div class="calc-header">
+      <span class="calc-title">Calculadora</span>
+      <button class="calc-close" onclick="toggleCalc()">✕</button>
+    </div>
+    <div class="calc-screen">
+      <div class="calc-expr" id="calc-expr"></div>
+      <div class="calc-val" id="calc-val">0</div>
+    </div>
+    <div class="calc-grid">
+      <button class="calc-btn clr" onclick="calcAC()">AC</button>
+      <button class="calc-btn op"  onclick="calcSign()">+/−</button>
+      <button class="calc-btn op"  onclick="calcPercent()">%</button>
+      <button class="calc-btn op"  onclick="calcOp('/')">÷</button>
+      <button class="calc-btn" onclick="calcNum('7')">7</button>
+      <button class="calc-btn" onclick="calcNum('8')">8</button>
+      <button class="calc-btn" onclick="calcNum('9')">9</button>
+      <button class="calc-btn op"  onclick="calcOp('*')">×</button>
+      <button class="calc-btn" onclick="calcNum('4')">4</button>
+      <button class="calc-btn" onclick="calcNum('5')">5</button>
+      <button class="calc-btn" onclick="calcNum('6')">6</button>
+      <button class="calc-btn op"  onclick="calcOp('-')">−</button>
+      <button class="calc-btn" onclick="calcNum('1')">1</button>
+      <button class="calc-btn" onclick="calcNum('2')">2</button>
+      <button class="calc-btn" onclick="calcNum('3')">3</button>
+      <button class="calc-btn op"  onclick="calcOp('+')">+</button>
+      <button class="calc-btn span2" onclick="calcNum('0')">0</button>
+      <button class="calc-btn" onclick="calcDot()">.</button>
+      <button class="calc-btn eq"  onclick="calcEquals()">=</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast hide" id="toast"></div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-brand">
+    <span style="font-size:26px">💻</span>
+    <div>
+      <div class="brand-title">Janet Silva</div>
+      <div class="brand-sub">Gestão de Atendimentos</div>
+    </div>
+  </div>
+  <nav class="nav">
+    <button class="nav-item active" onclick="showTab('dashboard',this)">✦ Painel</button>
+    <button class="nav-item" onclick="showTab('agendamentos',this)">📅 Agendamentos</button>
+    <button class="nav-item" onclick="showTab('fiado',this)">📒 Fiado</button>
+    <button class="nav-item" onclick="showTab('relatorios',this)">◎ Relatórios</button>
+    <button class="nav-item" onclick="showTab('clientes',this)">👤 Clientes</button>
+  </nav>
+</div>
+
+<main class="main">
+
+  <!-- PAINEL -->
+  <div id="page-dashboard" class="page active">
+    <div class="page-header">
+      <div class="page-title">Painel Geral</div>
+      <div class="page-subtitle">Visão consolidada do seu estúdio</div>
+    </div>
+    <div class="stat-grid-4">
+      <div class="stat-card accent"><div class="stat-icon">📅</div><div class="stat-label">Agendamentos</div><div class="stat-value" style="color:var(--accent)" id="d-total-ag">—</div><div class="stat-sub" id="d-ag-sub">—</div></div>
+      <div class="stat-card green"><div class="stat-icon">💰</div><div class="stat-label">Receita Recebida</div><div class="stat-value" style="color:var(--green)" id="d-revenue">—</div><div class="stat-sub" id="d-revenue-sub">—</div></div>
+      <div class="stat-card rose"><div class="stat-icon">⏳</div><div class="stat-label">A Receber</div><div class="stat-value" style="color:var(--rose)" id="d-pendente">—</div><div class="stat-sub" id="d-pendente-sub">—</div></div>
+      <div class="stat-card purple"><div class="stat-icon">📒</div><div class="stat-label">Fiado Pendente</div><div class="stat-value" style="color:var(--purple)" id="d-fiado">—</div><div class="stat-sub" id="d-fiado-count">—</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Receita por Dia (R$)</div>
+      <div id="d-chart"><div class="empty-state">Sem dados ainda</div></div>
+      <div class="legend">
+        <span><span class="legend-dot" style="background:var(--accent);opacity:0.8"></span>Recebido</span>
+        <span><span class="legend-dot" style="background:var(--rose)"></span>Fiado</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Próximos Agendamentos</div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Cliente</th><th>Serviço</th><th>Data / Hora</th><th>Valor</th><th>Status</th></tr></thead>
+        <tbody id="d-proximos"></tbody>
+      </table></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Serviços Mais Realizados</div>
+      <div id="d-top-services"><div class="empty-state">Sem dados ainda</div></div>
+    </div>
+  </div>
+
+  <!-- AGENDAMENTOS -->
+  <div id="page-agendamentos" class="page">
+    <div class="page-header">
+      <div class="page-title"> Agendamentos</div>
+      <div class="page-subtitle">Gerencie seus atendimentos e clientes</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Novo Agendamento</div>
+      <hr class="divider" />
+      <div id="ag-alert"></div>
+      <div class="form-stack">
+
+        <!-- Campo cliente com autocomplete manual -->
+        <div class="row-2">
+          <div class="field cliente-wrap">
+            <label>Nome da Cliente</label>
+            <input
+              id="ag-cliente"
+              placeholder="Digite o nome..."
+              autocomplete="off"
+              oninput="onClienteInput()"
+              onblur="hideSuggestionsDelayed()"
+            />
+            <div class="cliente-suggestions" id="ag-suggestions"></div>
+          </div>
+          <div class="field">
+            <label>Telefone / WhatsApp</label>
+            <!-- type="tel" abre teclado numérico no celular -->
+            <input
+              type="tel"
+              id="ag-telefone"
+              placeholder="(00) 00000-0000"
+              inputmode="numeric"
+              maxlength="16"
+              oninput="maskPhone(this)"
+            />
+          </div>
+        </div>
+
+        <div class="row-2">
+          <div class="field">
+            <label>Serviço</label>
+            <select id="ag-servico" onchange="updateAgPreview()">
+              <option value="">Selecione...</option>
+              <option value="Designer de Sobrancelha">✏️ Designer de Sobrancelha</option>
+              <option value="Henna">🌿 Henna</option>
+              <option value="Micropigmentação">💫 Micropigmentação</option>
+              <option value="Depilação">🌙 Depilação</option>
+              <option value="Extensão de Cílios">✨ Extensão de Cílios</option>
+              <option value="Massagem">💆 Massagem</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Valor do Serviço (R$)</label>
+            <!-- inputmode="decimal" abre teclado numérico com vírgula/ponto no celular -->
+            <input
+              type="number"
+              id="ag-valor"
+              min="0"
+              step="0.01"
+              placeholder="0,00"
+              inputmode="decimal"
+              oninput="updateAgPreview()"
+            />
+          </div>
+        </div>
+
+        <div class="row-2">
+          <div class="field">
+            <label> Data do Atendimento</label>
+            <input type="date" id="ag-data" />
+          </div>
+          <div class="field">
+            <label> Horário</label>
+            <input type="time" id="ag-hora" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Observações (opcional)</label>
+          <textarea id="ag-obs" placeholder="Ex: retoque, alergia, preferências..."></textarea>
+        </div>
+
+        <!-- Toggle Fiado -->
+        <div class="toggle-row" onclick="toggleFiado()">
+          <div class="toggle-switch" id="fiado-toggle"></div>
+          <span class="toggle-label">Pagamento no <strong>fiado</strong> — pagar depois</span>
+        </div>
+
+        <!-- Campos fiado (só aparece quando toggle está ON) -->
+        <div id="fiado-options-wrap" class="hidden">
+          <div class="row-2" style="margin-bottom:0">
+            <div class="toggle-row" id="toggle-simples" onclick="setFiadoTipo('simples')" style="border-color:var(--accent);background:var(--accent-dim)">
+              <div style="font-size:18px">📅</div>
+              <div>
+                <div style="font-size:13px;font-weight:700;color:var(--text)">À prazo</div>
+                <div style="font-size:11px;color:var(--text-muted)">Paga tudo de uma vez</div>
+              </div>
+            </div>
+            <div class="toggle-row" id="toggle-parcelado" onclick="setFiadoTipo('parcelado')" style="cursor:pointer">
+              <div style="font-size:18px">📊</div>
+              <div>
+                <div style="font-size:13px;font-weight:700;color:var(--text)">Parcelado</div>
+                <div style="font-size:11px;color:var(--text-muted)">Divide até 6× mensais</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field" id="fiado-due-wrap">
+            <label>📅 Data de Vencimento</label>
+            <input type="date" id="ag-due-date" />
+          </div>
+
+          <div id="parcelamento-wrap" class="hidden">
+            <label style="display:block;margin-bottom:6px">Número de Parcelas (até 6×)</label>
+            <div class="parcela-grid" id="parcela-opcoes"></div>
+            <div id="parcela-preview-wrap" class="hidden">
+              <div style="font-size:11px;color:var(--text-dim);margin:10px 0 6px;text-transform:uppercase;letter-spacing:0.08em;font-weight:700">Cronograma de parcelas</div>
+              <div class="parcela-preview" id="parcela-preview-list"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="ag-preview" class="preview-box hidden"></div>
+        <button class="btn btn-primary" onclick="addAgendamento()"> Registrar Atendimento</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-actions">
+        <div class="card-title" style="margin-bottom:0">Histórico de Atendimentos</div>
+        <button class="btn-clear" onclick="clearAgendamentos()">🗑 Limpar Histórico</button>
+      </div>
+      <div style="margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap">
+        <select id="ag-filter-status" onchange="renderAgendamentos()" style="width:auto;font-size:13px;padding:6px 10px">
+          <option value="">Todos os status</option>
+          <option value="agendado">Agendado</option>
+          <option value="confirmado">Confirmado</option>
+          <option value="concluido">Concluído</option>
+          <option value="cancelado">Cancelado</option>
+        </select>
+        <select id="ag-filter-servico" onchange="renderAgendamentos()" style="width:auto;font-size:13px;padding:6px 10px">
+          <option value="">Todos os serviços</option>
+          <option value="Designer de Sobrancelha">Designer</option>
+          <option value="Henna">Henna</option>
+          <option value="Micropigmentação">Micropigmentação</option>
+          <option value="Depilação">Depilação</option>
+          <option value="Extensão de Cílios">Ext. Cílios</option>
+          <option value="Massagem">Massagem</option>
+        </select>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Cliente</th><th>Serviço</th><th>Data / Hora</th><th>Valor</th><th>Pagamento</th><th>Status</th><th>Ações</th></tr></thead>
+        <tbody id="ag-list"></tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- FIADO -->
+  <div id="page-fiado" class="page">
+    <div class="page-header">
+      <div class="page-title"> Caderninho de Fiado</div>
+      <div class="page-subtitle">Controle de clientes com pagamento pendente</div>
+    </div>
+    <div class="stat-grid-3">
+      <div class="stat-card purple"><div class="stat-icon">📒</div><div class="stat-label">Total Pendente</div><div class="stat-value" style="color:var(--purple)" id="f-total-pendente">—</div><div class="stat-sub" id="f-count-pendente">—</div></div>
+      <div class="stat-card red"><div class="stat-icon">⏰</div><div class="stat-label">Atrasados</div><div class="stat-value" style="color:var(--red)" id="f-total-atrasado">—</div><div class="stat-sub" id="f-count-atrasado">—</div></div>
+      <div class="stat-card green"><div class="stat-icon">✅</div><div class="stat-label">Total Recebido</div><div class="stat-value" style="color:var(--green)" id="f-total-pago">—</div><div class="stat-sub" id="f-count-pago">—</div></div>
+    </div>
+    <div class="card">
+      <div class="section-actions">
+        <div class="card-title" style="margin-bottom:0">Fiados Pendentes</div>
+        <button class="btn-clear" onclick="clearFiados()">🗑 Limpar Histórico</button>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Cliente</th><th>Serviço</th><th>Valor</th><th>Parcelas</th><th>Vencimento</th><th>Status</th><th>Ações</th></tr></thead>
+        <tbody id="f-pending-list"></tbody>
+      </table></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Histórico de Fiados Pagos</div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Cliente</th><th>Serviço</th><th>Valor</th><th>Pago em</th></tr></thead>
+        <tbody id="f-paid-list"></tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- RELATÓRIOS -->
+  <div id="page-relatorios" class="page">
+    <div class="page-header">
+      <div class="page-title"> Relatórios</div>
+      <div class="page-subtitle">Análise financeira completa dos serviços</div>
+    </div>
+    <div class="stat-grid-3">
+      <div class="stat-card green"><div class="stat-icon">💰</div><div class="stat-label">Receita Recebida</div><div class="stat-value" style="color:var(--green)" id="r-recebido">—</div><div class="stat-sub">serviços à vista</div></div>
+      <div class="stat-card rose"><div class="stat-icon">⏳</div><div class="stat-label">A Receber</div><div class="stat-value" style="color:var(--rose)" id="r-pendente">—</div><div class="stat-sub">fiados em aberto</div></div>
+      <div class="stat-card teal"><div class="stat-icon">📊</div><div class="stat-label">Total Faturado</div><div class="stat-value" style="color:var(--teal)" id="r-total">—</div><div class="stat-sub" id="r-total-sub">—</div></div>
+    </div>
+    <div class="card" id="r-margin-card" style="display:none">
+      <div class="card-title">Percentual Recebido</div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text-muted);margin-bottom:6px">
+        <span>0%</span><strong style="color:var(--green)" id="r-margin-pct">—</strong><span>100%</span>
+      </div>
+      <div class="prog-wrap"><div class="prog-bar" id="r-margin-bar" style="width:0%"></div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Receita por Dia (R$)</div>
+      <div id="r-chart"><div class="empty-state">Sem dados</div></div>
+    </div>
+    <div class="card">
+      <div class="section-actions">
+        <div class="card-title" style="margin-bottom:0">Desempenho por Serviço</div>
+        <button class="btn-clear" onclick="clearRelatorios()">🗑 Limpar Histórico</button>
+      </div>
+      <div id="r-by-service"><div class="empty-state">Sem dados</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Lista Completa de Serviços</div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Cliente</th><th>Serviço</th><th>Data</th><th>Valor</th><th>Pagamento</th></tr></thead>
+        <tbody id="r-list"></tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- CLIENTES -->
+  <div id="page-clientes" class="page">
+    <div class="page-header">
+      <div class="page-title"> Perfis de Clientes</div>
+      <div class="page-subtitle">Histórico completo — atendimentos, fiados e gastos</div>
+    </div>
+    <div class="stat-grid-3">
+      <div class="stat-card gold"><div class="stat-icon">👥</div><div class="stat-label">Clientes Únicas</div><div class="stat-value" style="color:var(--gold)" id="c-total-clients">—</div><div class="stat-sub">registradas</div></div>
+      <div class="stat-card green"><div class="stat-icon">💰</div><div class="stat-label">Maior Cliente</div><div class="stat-value" style="color:var(--green);font-size:15px" id="c-top-client">—</div><div class="stat-sub" id="c-top-client-val">—</div></div>
+      <div class="stat-card purple"><div class="stat-icon">📒</div><div class="stat-label">Clientes c/ Fiado</div><div class="stat-value" style="color:var(--purple)" id="c-fiado-clients">—</div><div class="stat-sub">com saldo pendente</div></div>
+    </div>
+    <div class="section-actions" style="margin-bottom:8px">
+      <div style="font-size:14px;color:var(--text-muted)">Perfis criados automaticamente ao agendar</div>
+      <button class="btn-clear" onclick="clearClientes()">🗑 Limpar Histórico</button>
+    </div>
+    <div id="c-list">
+      <div class="empty-state"><div class="empty-icon">👤</div>Nenhuma cliente registrada ainda.<br><span style="font-size:12px">Os perfis são criados automaticamente ao registrar atendimentos.</span></div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ══════════════════════════════════════════════════════
+//  LOCALSTORAGE
+// ══════════════════════════════════════════════════════
+const LS_AG  = 'sb_agendamentos';
+const LS_FI  = 'sb_fiados';
+const LS_IDS = 'sb_ids';
+
+function saveState() {
+  localStorage.setItem(LS_AG,  JSON.stringify(agendamentos));
+  localStorage.setItem(LS_FI,  JSON.stringify(fiados));
+  localStorage.setItem(LS_IDS, JSON.stringify({ nextAgId, nextFId }));
+}
+function loadState() {
+  try {
+    const a   = localStorage.getItem(LS_AG);
+    const f   = localStorage.getItem(LS_FI);
+    const ids = localStorage.getItem(LS_IDS);
+    if (a)   agendamentos = JSON.parse(a);
+    if (f)   fiados       = JSON.parse(f);
+    if (ids) { const o = JSON.parse(ids); nextAgId = o.nextAgId; nextFId = o.nextFId; }
+  } catch(e) { console.warn('Erro ao carregar dados:', e); }
+}
+
+// ══════════════════════════════════════════════════════
+//  ESTADO GLOBAL
+// ══════════════════════════════════════════════════════
+let agendamentos = [], fiados = [];
+let nextAgId = 1, nextFId = 1;
+
+// ── estado do fiado (ISOLADO — não vaza entre registros) ──
+let isFiado    = false;
+let fiadoTipo  = 'simples'; // 'simples' | 'parcelado'
+let numParcelas = 2;
+
+loadState();
+
+// ══════════════════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════════════════
+const R = v => new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v||0);
+const fmtDate = iso => {
+  const d = new Date(iso);
+  return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+};
+const fmtDateOnly = iso => iso ? new Date(iso+'T00:00:00').toLocaleDateString('pt-BR') : '—';
+const fmtDateTime = (data, hora) => {
+  if (!data) return '—';
+  if (hora) {
+    return new Date(data+'T'+hora).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  }
+  return fmtDateOnly(data);
+};
+
+// ── Máscara de telefone: (55) 9 9999-9999 ou (55) 9999-9999 ──
+function maskPhone(input) {
+  let v = input.value.replace(/\D/g, '').slice(0, 13); // max 13 dígitos (55 + 11)
+  let r = '';
+  if (v.length === 0) { input.value = ''; return; }
+  // DDI
+  if (v.length <= 2) {
+    r = '(' + v;
+  } else if (v.length <= 7) {
+    // (55) XXXXX
+    r = '(' + v.slice(0,2) + ') ' + v.slice(2);
+  } else if (v.length <= 11) {
+    // (55) XXXXX-XXXX  ou (55) XXXX-XXXX
+    const body = v.slice(2);
+    if (body.length <= 8) {
+      r = '(' + v.slice(0,2) + ') ' + body.slice(0,4) + '-' + body.slice(4);
+    } else {
+      r = '(' + v.slice(0,2) + ') ' + body.slice(0,5) + '-' + body.slice(5);
+    }
+  } else {
+    // (55) 32 9XXXX-XXXX  (com DDD)
+    const ddi  = v.slice(0,2);
+    const ddd  = v.slice(2,4);
+    const body = v.slice(4);
+    if (body.length <= 8) {
+      r = '(' + ddi + ') ' + ddd + ' ' + body.slice(0,4) + '-' + body.slice(4);
+    } else {
+      r = '(' + ddi + ') ' + ddd + ' ' + body.slice(0,5) + '-' + body.slice(5);
+    }
+  }
+  input.value = r;
+}
+
+function servicoBadge(s) {
+  const map = {
+    'Designer de Sobrancelha': `<span class="srv-designer">✏️ Designer</span>`,
+    'Henna':                   `<span class="srv-henna">🌿 Henna</span>`,
+    'Micropigmentação':        `<span class="srv-micropig">💫 Micropig.</span>`,
+    'Depilação':               `<span class="srv-depilacao">🌙 Depilação</span>`,
+    'Extensão de Cílios':      `<span class="srv-cilios">✨ Ext. Cílios</span>`,
+    'Massagem':                `<span class="srv-massagem">💆 Massagem</span>`,
+  };
+  return map[s] || `<span class="badge badge-amber">${s}</span>`;
+}
+
+function statusAgBadge(s) {
+  const map = {
+    'agendado':   '<span class="ag-status-agendado">📅 Agendado</span>',
+    'confirmado': '<span class="ag-status-confirmado">✓ Confirmado</span>',
+    'concluido':  '<span class="ag-status-concluido">✅ Concluído</span>',
+    'cancelado':  '<span class="ag-status-cancelado">✕ Cancelado</span>',
+  };
+  return map[s] || s;
+}
+
+function pagBadge(tipo) {
+  return tipo === 'fiado'
+    ? '<span class="badge badge-purple" style="font-size:11px">📒 Fiado</span>'
+    : '<span class="badge badge-green"  style="font-size:11px">💵 À Vista</span>';
+}
+
+function showAlert(id, type, msg) {
+  document.getElementById(id).innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+  if (type==='success') setTimeout(()=>{ const el=document.getElementById(id); if(el) el.innerHTML=''; }, 3500);
+}
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.remove('hide');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => t.classList.add('hide'), 2800);
+}
+function showTab(tab, btn) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+tab).classList.add('active');
+  btn.classList.add('active');
+  renderAll();
+}
+
+// ══════════════════════════════════════════════════════
+//  AUTOCOMPLETE DE CLIENTE — sugestão clicável
+// ══════════════════════════════════════════════════════
+function getClientNames() {
+  const map = {};
+  agendamentos.forEach(a => {
+    if (!a.cliente) return;
+    const key = a.cliente.toLowerCase();
+    if (!map[key]) map[key] = { nome: a.cliente, telefone: a.telefone||'', count: 0, servicos: new Set() };
+    map[key].count++;
+    if (a.servico) map[key].servicos.add(a.servico);
+    if (a.telefone && !map[key].telefone) map[key].telefone = a.telefone;
+  });
+  return Object.values(map);
+}
+
+let _hideTimer = null;
+
+function onClienteInput() {
+  clearTimeout(_hideTimer);
+  const val = document.getElementById('ag-cliente').value.trim().toLowerCase();
+  const box  = document.getElementById('ag-suggestions');
+
+  if (val.length < 1) { box.classList.remove('show'); box.innerHTML = ''; return; }
+
+  const clients = getClientNames().filter(c => c.nome.toLowerCase().includes(val));
+  if (!clients.length) { box.classList.remove('show'); box.innerHTML = ''; return; }
+
+  box.innerHTML = clients.slice(0,6).map(c => {
+    const initials = c.nome.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    const srvList  = [...c.servicos].slice(0,2).join(', ');
+    const meta     = [c.telefone, srvList, `${c.count} atend.`].filter(Boolean).join(' · ');
+    return `<div class="suggestion-item" onmousedown="selectCliente('${c.nome.replace(/'/g,"\\'")}','${c.telefone.replace(/'/g,"\\'")}')">
+      <div class="suggestion-avatar">${initials}</div>
+      <div class="suggestion-info">
+        <div class="suggestion-name">${c.nome}</div>
+        <div class="suggestion-meta">${meta}</div>
+      </div>
+      <div class="suggestion-use">Usar ▶</div>
+    </div>`;
+  }).join('');
+  box.classList.add('show');
+}
+
+function selectCliente(nome, telefone) {
+  document.getElementById('ag-cliente').value  = nome;
+  document.getElementById('ag-telefone').value = telefone || '';
+  document.getElementById('ag-suggestions').classList.remove('show');
+  showToast(`✓ Cliente selecionada: ${nome}`);
+}
+
+function hideSuggestionsDelayed() {
+  _hideTimer = setTimeout(() => {
+    document.getElementById('ag-suggestions').classList.remove('show');
+  }, 200);
+}
+
+// ══════════════════════════════════════════════════════
+//  PREVIEW DO AGENDAMENTO
+// ══════════════════════════════════════════════════════
+function updateAgPreview() {
+  const servico = document.getElementById('ag-servico').value;
+  const valor   = parseFloat(document.getElementById('ag-valor').value);
+  const el      = document.getElementById('ag-preview');
+  if (servico && valor > 0) {
+    const pagLabel = isFiado
+      ? '<span class="badge badge-purple">📒 Fiado</span>'
+      : '<span class="badge badge-green">💵 À Vista</span>';
+    el.innerHTML = `
+      <div class="prow"><span>Serviço</span><span>${servicoBadge(servico)}</span></div>
+      <div class="prow"><span>Pagamento</span><span>${pagLabel}</span></div>
+      <div class="prow total"><span>Valor total</span><span style="color:var(--accent);font-weight:700">${R(valor)}</span></div>`;
+    el.classList.remove('hidden');
+    if (isFiado && fiadoTipo==='parcelado') buildParcelaOptions();
+  } else {
+    el.classList.add('hidden');
+  }
+}
+
+// ══════════════════════════════════════════════════════
+//  TOGGLE FIADO
+// ══════════════════════════════════════════════════════
+function toggleFiado() {
+  isFiado = !isFiado;
+  document.getElementById('fiado-toggle').classList.toggle('on', isFiado);
+  document.getElementById('fiado-options-wrap').classList.toggle('hidden', !isFiado);
+  if (isFiado) setFiadoTipo('simples');
+  updateAgPreview();
+}
+
+function setFiadoTipo(tipo) {
+  fiadoTipo = tipo;
+  const sEl     = document.getElementById('toggle-simples');
+  const pEl     = document.getElementById('toggle-parcelado');
+  const dueWrap = document.getElementById('fiado-due-wrap');
+  const parWrap = document.getElementById('parcelamento-wrap');
+  if (tipo === 'simples') {
+    sEl.style.borderColor = 'var(--accent)'; sEl.style.background = 'var(--accent-dim)';
+    pEl.style.borderColor = 'var(--border)'; pEl.style.background = '#faf7f5';
+    dueWrap.classList.remove('hidden');
+    parWrap.classList.add('hidden');
+    if (!document.getElementById('ag-due-date').value) {
+      const d = new Date(); d.setMonth(d.getMonth()+1);
+      document.getElementById('ag-due-date').value = d.toISOString().split('T')[0];
+    }
+  } else {
+    pEl.style.borderColor = 'var(--accent)'; pEl.style.background = 'var(--accent-dim)';
+    sEl.style.borderColor = 'var(--border)'; sEl.style.background = '#faf7f5';
+    dueWrap.classList.add('hidden');
+    parWrap.classList.remove('hidden');
+    buildParcelaOptions();
+  }
+}
+
+function buildParcelaOptions() {
+  const valor   = parseFloat(document.getElementById('ag-valor').value);
+  const total   = isNaN(valor) ? 0 : valor;
+  const options = [2,3,4,5,6];
+  document.getElementById('parcela-opcoes').innerHTML = options.map(n => {
+    const val = total > 0 ? R(total/n) : '—';
+    return `<div class="parcela-option${numParcelas===n?' selected':''}" onclick="selectParcela(${n})">
+      <div class="parcela-num">${n}×</div>
+      <div class="parcela-val">${val}/mês</div>
+    </div>`;
+  }).join('');
+  if (total > 0) buildParcelaPreview(total);
+  else document.getElementById('parcela-preview-wrap').classList.add('hidden');
+}
+
+function selectParcela(n) { numParcelas = n; buildParcelaOptions(); }
+
+function buildParcelaPreview(total) {
+  const valParcela = total / numParcelas;
+  document.getElementById('parcela-preview-wrap').classList.remove('hidden');
+  const today = new Date();
+  document.getElementById('parcela-preview-list').innerHTML = Array.from({length:numParcelas}, (_,i) => {
+    const d = new Date(today); d.setMonth(d.getMonth()+i+1);
+    return `<div class="parcela-row">
+      <span><span class="parcela-num-badge">${i+1}ª</span>${d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'})}</span>
+      <span style="color:var(--accent);font-weight:700">${R(valParcela)}</span>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════
+//  AÇÃO — ADICIONAR AGENDAMENTO
+// ══════════════════════════════════════════════════════
+function addAgendamento() {
+  const cliente  = document.getElementById('ag-cliente').value.trim();
+  const telefone = document.getElementById('ag-telefone').value.trim();
+  const servico  = document.getElementById('ag-servico').value;
+  const valor    = parseFloat(document.getElementById('ag-valor').value);
+  const data     = document.getElementById('ag-data').value;
+  const hora     = document.getElementById('ag-hora').value;
+  const obs      = document.getElementById('ag-obs').value.trim();
+  const dueDate  = document.getElementById('ag-due-date').value;
+
+  if (!cliente)               { showAlert('ag-alert','error','Informe o nome da cliente.'); return; }
+  if (!servico)               { showAlert('ag-alert','error','Selecione o serviço.'); return; }
+  if (isNaN(valor)||valor<=0) { showAlert('ag-alert','error','Informe o valor do serviço.'); return; }
+  if (isFiado && !cliente)    { showAlert('ag-alert','error','Nome obrigatório para fiado.'); return; }
+
+  // Normaliza o nome: se já existe cliente com mesmo nome (case-insensitive), usa o nome já cadastrado
+  const existente = agendamentos.find(a => a.cliente && a.cliente.toLowerCase() === cliente.toLowerCase());
+  const nomeNorm  = existente ? existente.cliente : cliente;
+
+  // ── CAPTURA O ESTADO DO FIADO AGORA (antes de qualquer reset) ──
+  const pagarFiado     = isFiado;             // true = fiado, false = à vista
+  const tipoFiado      = fiadoTipo;           // 'simples' | 'parcelado'
+  const qtdParcelas    = numParcelas;
+
+  const agObj = {
+    id:          nextAgId++,
+    cliente:     nomeNorm,
+    telefone,
+    servico,
+    valor,
+    data,
+    hora,
+    obs,
+    status:      'agendado',
+    paymentType: pagarFiado ? 'fiado' : 'avista',   // ← corrigido
+    isParcelado: pagarFiado && tipoFiado === 'parcelado',
+    totalParcelas: pagarFiado && tipoFiado === 'parcelado' ? qtdParcelas : null,
+    createdAt:   new Date().toISOString()
+  };
+  agendamentos.unshift(agObj);
+
+  // Cria fiados se necessário
+  if (pagarFiado) {
+    if (tipoFiado === 'parcelado') {
+      const valParcela = parseFloat((valor / qtdParcelas).toFixed(2));
+      for (let i = 0; i < qtdParcelas; i++) {
+        const d = new Date(); d.setMonth(d.getMonth()+i+1);
+        fiados.push({
+          id: nextFId++, agId: agObj.id,
+          cliente: nomeNorm, servico,
+          value: valParcela, totalValue: valor,
+          dueDate: d.toISOString().split('T')[0],
+          status: 'pendente',
+          isParcelado: true,
+          parcelaNum: i+1, totalParcelas: qtdParcelas,
+          createdAt: new Date().toISOString(), paidAt: null
+        });
+      }
+    } else {
+      fiados.push({
+        id: nextFId++, agId: agObj.id,
+        cliente: nomeNorm, servico,
+        value: valor,
+        dueDate: dueDate || null,
+        status: 'pendente',
+        isParcelado: false,
+        createdAt: new Date().toISOString(), paidAt: null
+      });
+    }
+  }
+
+  // ── RESET COMPLETO DO FORMULÁRIO ──
+  ['ag-cliente','ag-telefone','ag-valor','ag-data','ag-hora','ag-obs','ag-due-date'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  document.getElementById('ag-servico').value = '';
+  document.getElementById('ag-preview').classList.add('hidden');
+  document.getElementById('ag-suggestions').classList.remove('show');
+
+  // ── RESET COMPLETO DO ESTADO DO FIADO ──
+  isFiado     = false;
+  fiadoTipo   = 'simples';
+  numParcelas = 2;
+  document.getElementById('fiado-toggle').classList.remove('on');
+  document.getElementById('fiado-options-wrap').classList.add('hidden');
+  document.getElementById('parcelamento-wrap').classList.add('hidden');
+  document.getElementById('parcela-preview-wrap').classList.add('hidden');
+
+  const fiadoMsg = agObj.isParcelado ? ` em ${qtdParcelas}×` : pagarFiado ? ' (fiado)' : '';
+  showAlert('ag-alert','success',`✅ ${nomeNorm} — ${servico} registrado! ${R(valor)}${fiadoMsg}`);
+  showToast(`🌸 ${nomeNorm} · ${servico} · ${R(valor)}${fiadoMsg}`);
+  saveState(); renderAll();
+}
+
+// ══════════════════════════════════════════════════════
+//  AÇÕES — AGENDAMENTOS
+// ══════════════════════════════════════════════════════
+function removeAgendamento(id) {
+  if (!confirm('Remover este atendimento?')) return;
+  agendamentos = agendamentos.filter(a=>a.id!==id);
+  fiados       = fiados.filter(f=>f.agId!==id);
+  saveState(); renderAll();
+}
+
+function updateStatusAg(id, status) {
+  const a = agendamentos.find(x=>x.id===id);
+  if (!a) return;
+  a.status = status;
+  saveState(); renderAll();
+  showToast(`Status de ${a.cliente}: ${status}`);
+}
+
+// ══════════════════════════════════════════════════════
+//  AÇÕES — FIADO
+// ══════════════════════════════════════════════════════
+function getFiadoStatus(f) {
+  if (f.status === 'pago') return 'pago';
+  const today = new Date(); today.setHours(0,0,0,0);
+  if (f.dueDate) { const due = new Date(f.dueDate+'T00:00:00'); if (due < today) return 'atrasado'; }
+  return 'pendente';
+}
+
+function marcarPago(id) {
+  const f = fiados.find(x=>x.id===id);
+  if (!f) return;
+  if (!confirm(`Marcar fiado de ${f.cliente} (${R(f.value)}) como pago?`)) return;
+  f.status = 'pago';
+  f.paidAt = new Date().toISOString();
+  showToast(`✅ ${f.cliente} pagou ${R(f.value)}`);
+  saveState(); renderAll();
+}
+
+function removeFiado(id) {
+  if (!confirm('Remover este fiado?')) return;
+  fiados = fiados.filter(f=>f.id!==id);
+  saveState(); renderAll();
+}
+
+// ══════════════════════════════════════════════════════
+//  LIMPAR HISTÓRICOS
+// ══════════════════════════════════════════════════════
+function clearAgendamentos() {
+  if (!confirm('⚠️ Apagar TODO o histórico de agendamentos? Esta ação não pode ser desfeita.')) return;
+  agendamentos = []; saveState(); renderAll();
+  showToast('🗑 Histórico de agendamentos limpo.');
+}
+function clearFiados() {
+  if (!confirm('⚠️ Apagar TODO o histórico de fiados?')) return;
+  fiados = []; saveState(); renderAll();
+  showToast('🗑 Histórico de fiados limpo.');
+}
+function clearRelatorios() {
+  if (!confirm('⚠️ Apagar todos os registros? Esta ação remove agendamentos e fiados.')) return;
+  agendamentos = []; fiados = []; saveState(); renderAll();
+  showToast('🗑 Histórico limpo.');
+}
+function clearClientes() {
+  if (!confirm('⚠️ Apagar todo o histórico de clientes?')) return;
+  agendamentos = []; fiados = []; saveState(); renderAll();
+  showToast('🗑 Histórico de clientes limpo.');
+}
+
+// ══════════════════════════════════════════════════════
+//  CLIENTES — agregação por nome
+// ══════════════════════════════════════════════════════
+function getClients() {
+  const map = {};
+  agendamentos.forEach(a => {
+    if (!a.cliente) return;
+    const key = a.cliente.toLowerCase();
+    if (!map[key]) map[key] = { name: a.cliente, telefone: a.telefone||'', atendimentos: [], fiados: [] };
+    if (a.telefone && !map[key].telefone) map[key].telefone = a.telefone;
+    map[key].atendimentos.push(a);
+  });
+  fiados.forEach(f => {
+    const key = f.cliente ? f.cliente.toLowerCase() : null;
+    if (!key) return;
+    if (!map[key]) map[key] = { name: f.cliente, telefone:'', atendimentos:[], fiados:[] };
+    if (!map[key].fiados.find(x=>x.id===f.id)) map[key].fiados.push(f);
+  });
+  return Object.values(map);
+}
+
+function getClientStats(client) {
+  const totalGasto = client.atendimentos.filter(a=>a.paymentType!=='fiado').reduce((s,a)=>s+a.valor,0);
+  const fiadosPend = client.fiados.filter(f=>f.status!=='pago');
+  const fiadosPago = client.fiados.filter(f=>f.status==='pago');
+  const pendVal    = fiadosPend.reduce((s,f)=>s+f.value,0);
+  const pagoVal    = fiadosPago.reduce((s,f)=>s+f.value,0);
+  return { totalGasto, fiadosPend, fiadosPago, pendVal, pagoVal };
+}
+
+// ══════════════════════════════════════════════════════
+//  GRÁFICO
+// ══════════════════════════════════════════════════════
+function buildChart(containerId) {
+  const map = {};
+  agendamentos.forEach(a => {
+    const d = a.data || (a.createdAt ? a.createdAt.split('T')[0] : null);
+    if (!d) return;
+    const day = new Date(d+'T00:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+    if (!map[day]) map[day] = { rec:0, pend:0 };
+    if (a.paymentType === 'fiado') map[day].pend += a.valor;
+    else map[day].rec += a.valor;
+  });
+  const data   = Object.entries(map).slice(-14);
+  const el     = document.getElementById(containerId);
+  if (!data.length) { el.innerHTML = '<div class="empty-state">Sem dados</div>'; return; }
+  const maxVal = Math.max(...data.map(([,v])=>v.rec+v.pend), 1);
+  el.innerHTML = '<div class="chart-area">' + data.map(([dia,v]) => {
+    const rH = Math.round((v.rec/maxVal)*76);
+    const pH = Math.round((v.pend/maxVal)*76);
+    return `<div class="chart-col">
+      <div class="chart-col-bars">
+        <div class="chart-bar" style="height:${rH}px;background:var(--accent);opacity:0.8" data-val="${R(v.rec)}"></div>
+        <div class="chart-bar" style="height:${pH}px;background:var(--rose)"               data-val="${R(v.pend)}"></div>
+      </div>
+      <div class="chart-lbl">${dia}</div>
+    </div>`;
+  }).join('') + '</div>';
+}
+
+// ══════════════════════════════════════════════════════
+//  RENDER PAINEL
+// ══════════════════════════════════════════════════════
+function renderDashboard() {
+  const recebido  = agendamentos.filter(a=>a.paymentType!=='fiado').reduce((s,a)=>s+a.valor,0);
+  const fiPend    = fiados.filter(f=>f.status!=='pago');
+  const fiPendVal = fiPend.reduce((s,f)=>s+f.value,0);
+  const pendente  = agendamentos.filter(a=>a.paymentType==='fiado').reduce((s,a)=>s+a.valor,0);
+
+  document.getElementById('d-total-ag').textContent    = agendamentos.length;
+  document.getElementById('d-ag-sub').textContent      = agendamentos.length + ' atendimentos';
+  document.getElementById('d-revenue').textContent     = R(recebido);
+  document.getElementById('d-revenue-sub').textContent = 'à vista';
+  document.getElementById('d-pendente').textContent    = R(pendente);
+  document.getElementById('d-pendente-sub').textContent = 'em fiados';
+  document.getElementById('d-fiado').textContent       = R(fiPendVal);
+  document.getElementById('d-fiado-count').textContent = fiPend.length + ' pendente(s)';
+
+  buildChart('d-chart');
+
+  const now     = new Date();
+  const proximos = agendamentos
+    .filter(a => a.data && new Date(a.data+'T'+(a.hora||'00:00')) >= now && a.status !== 'cancelado')
+    .sort((x,y)=> new Date(x.data+'T'+(x.hora||'00:00')) - new Date(y.data+'T'+(y.hora||'00:00')))
+    .slice(0,5);
+  const pBody = document.getElementById('d-proximos');
+  pBody.innerHTML = proximos.length ? proximos.map(a=>`<tr>
+    <td><strong>${a.cliente}</strong></td>
+    <td>${servicoBadge(a.servico)}</td>
+    <td style="font-size:12px;white-space:nowrap">${fmtDateTime(a.data,a.hora)}</td>
+    <td><span class="badge badge-amber">${R(a.valor)}</span></td>
+    <td>${statusAgBadge(a.status)}</td>
+  </tr>`).join('') : '<tr><td colspan="5"><div class="empty-state">Sem agendamentos futuros</div></td></tr>';
+
+  const srvMap = {};
+  agendamentos.forEach(a => {
+    if (!srvMap[a.servico]) srvMap[a.servico] = { count:0, val:0 };
+    srvMap[a.servico].count++;
+    srvMap[a.servico].val += a.valor;
+  });
+  const srvSorted = Object.entries(srvMap).sort((a,b)=>b[1].count-a[1].count);
+  const maxCnt    = srvSorted.length ? srvSorted[0][1].count : 1;
+  const srvEl     = document.getElementById('d-top-services');
+  srvEl.innerHTML = srvSorted.length ? '<div style="margin-top:6px">' + srvSorted.map(([s,d])=>`
+    <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div style="min-width:150px">${servicoBadge(s)}</div>
+      <div style="flex:1"><div class="prog-wrap"><div class="prog-bar" style="width:${(d.count/maxCnt)*100}%;background:var(--accent);opacity:0.8"></div></div></div>
+      <div style="text-align:right;min-width:80px">
+        <div style="font-weight:700;color:var(--text)">${d.count}×</div>
+        <div style="font-size:11px;color:var(--text-muted)">${R(d.val)}</div>
+      </div>
+    </div>`).join('') + '</div>'
+  : '<div class="empty-state">Sem dados ainda</div>';
+}
+
+// ══════════════════════════════════════════════════════
+//  RENDER AGENDAMENTOS
+// ══════════════════════════════════════════════════════
+function renderAgendamentos() {
+  const filterStatus  = document.getElementById('ag-filter-status').value;
+  const filterServico = document.getElementById('ag-filter-servico').value;
+  let list = [...agendamentos];
+  if (filterStatus)  list = list.filter(a=>a.status===filterStatus);
+  if (filterServico) list = list.filter(a=>a.servico===filterServico);
+
+  const tbody = document.getElementById('ag-list');
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">📅</div>Nenhum atendimento encontrado.</div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(a=>`<tr>
+    <td>
+      <strong>${a.cliente}</strong>
+      ${a.telefone ? `<div style="font-size:11px;color:var(--text-muted)">📱 ${a.telefone}</div>` : ''}
+      ${a.obs ? `<div style="font-size:11px;color:var(--text-dim);margin-top:2px;font-style:italic">${a.obs}</div>` : ''}
+    </td>
+    <td>${servicoBadge(a.servico)}</td>
+    <td style="font-size:12px;white-space:nowrap">${fmtDateTime(a.data,a.hora)}</td>
+    <td><span class="badge badge-amber">${R(a.valor)}</span></td>
+    <td>
+      ${pagBadge(a.paymentType)}
+      ${a.isParcelado ? `<div style="margin-top:3px"><span class="installment-badge">📊 ${a.totalParcelas}×</span></div>` : ''}
+    </td>
+    <td>
+      <select onchange="updateStatusAg(${a.id},this.value)" style="font-size:11px;padding:4px 6px;border-radius:6px;width:auto">
+        <option value="agendado"   ${a.status==='agendado'?'selected':''}>📅 Agendado</option>
+        <option value="confirmado" ${a.status==='confirmado'?'selected':''}>✓ Confirmado</option>
+        <option value="concluido"  ${a.status==='concluido'?'selected':''}>✅ Concluído</option>
+        <option value="cancelado"  ${a.status==='cancelado'?'selected':''}>✕ Cancelado</option>
+      </select>
+    </td>
+    <td><button class="btn-danger" onclick="removeAgendamento(${a.id})">✕</button></td>
+  </tr>`).join('');
+}
+
+// ══════════════════════════════════════════════════════
+//  RENDER FIADO
+// ══════════════════════════════════════════════════════
+function renderFiado() {
+  const pending    = fiados.filter(f=>f.status!=='pago');
+  const paid       = fiados.filter(f=>f.status==='pago');
+  pending.forEach(f => { f.liveStatus = getFiadoStatus(f); });
+  const atrasados  = pending.filter(f=>f.liveStatus==='atrasado');
+  const totalPend  = pending.reduce((s,f)=>s+f.value,0);
+  const totalAtras = atrasados.reduce((s,f)=>s+f.value,0);
+  const totalPago  = paid.reduce((s,f)=>s+f.value,0);
+
+  document.getElementById('f-total-pendente').textContent = R(totalPend);
+  document.getElementById('f-count-pendente').textContent = pending.length + ' cliente(s)';
+  document.getElementById('f-total-atrasado').textContent = R(totalAtras);
+  document.getElementById('f-count-atrasado').textContent = atrasados.length + ' atrasado(s)';
+  document.getElementById('f-total-pago').textContent     = R(totalPago);
+  document.getElementById('f-count-pago').textContent     = paid.length + ' recebido(s)';
+
+  const pBody = document.getElementById('f-pending-list');
+  pBody.innerHTML = pending.length ? pending.map(f => {
+    const st      = f.liveStatus;
+    const stBadge = st==='atrasado'
+      ? '<span class="fiado-status-atrasado">⏰ Atrasado</span>'
+      : '<span class="fiado-status-pendente">📒 Pendente</span>';
+    const parcBadge = f.isParcelado
+      ? `<span class="installment-badge">📊 ${f.parcelaNum}ª/${f.totalParcelas}</span>`
+      : '';
+    return `<tr>
+      <td><strong>${f.cliente}</strong></td>
+      <td>${servicoBadge(f.servico)}${parcBadge?`<div style="margin-top:3px">${parcBadge}</div>`:''}</td>
+      <td><span class="badge badge-purple">${R(f.value)}</span></td>
+      <td style="font-size:12px;color:var(--text-muted)">${f.isParcelado?'Mensal':'—'}</td>
+      <td style="font-size:12px;color:var(--text-muted)">${fmtDateOnly(f.dueDate)}</td>
+      <td>${stBadge}</td>
+      <td style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn-success" onclick="marcarPago(${f.id})">✓ Pago</button>
+        <button class="btn-danger"  onclick="removeFiado(${f.id})">✕</button>
+      </td>
+    </tr>`;
+  }).join('')
+  : '<tr><td colspan="7"><div class="empty-state">Nenhum fiado pendente 🎉</div></td></tr>';
+
+  const dBody = document.getElementById('f-paid-list');
+  dBody.innerHTML = paid.length ? paid.map(f=>`<tr>
+    <td><strong>${f.cliente}</strong></td>
+    <td>${servicoBadge(f.servico)}</td>
+    <td><span class="badge badge-green">${R(f.value)}</span></td>
+    <td style="font-size:12px;color:var(--text-muted)">${f.paidAt ? fmtDate(f.paidAt) : '—'}</td>
+  </tr>`).join('')
+  : '<tr><td colspan="4"><div class="empty-state">Nenhum fiado pago ainda</div></td></tr>';
+}
+
+// ══════════════════════════════════════════════════════
+//  RENDER RELATÓRIOS
+// ══════════════════════════════════════════════════════
+function renderRelatorios() {
+  const recebido = agendamentos.filter(a=>a.paymentType!=='fiado').reduce((s,a)=>s+a.valor,0);
+  const pendente = fiados.filter(f=>f.status!=='pago').reduce((s,f)=>s+f.value,0);
+  const total    = recebido + pendente;
+  const pct      = total > 0 ? (recebido/total)*100 : 0;
+
+  document.getElementById('r-recebido').textContent  = R(recebido);
+  document.getElementById('r-pendente').textContent  = R(pendente);
+  document.getElementById('r-total').textContent     = R(total);
+  document.getElementById('r-total-sub').textContent = agendamentos.length + ' atendimentos';
+
+  if (total > 0) {
+    document.getElementById('r-margin-card').style.display = '';
+    document.getElementById('r-margin-pct').textContent    = pct.toFixed(1) + '%';
+    document.getElementById('r-margin-bar').style.width    = Math.min(pct,100) + '%';
+  } else {
+    document.getElementById('r-margin-card').style.display = 'none';
+  }
+
+  buildChart('r-chart');
+
+  const srvMap = {};
+  agendamentos.forEach(a => {
+    if (!srvMap[a.servico]) srvMap[a.servico] = { count:0, recebido:0, pendente:0 };
+    srvMap[a.servico].count++;
+    if (a.paymentType!=='fiado') srvMap[a.servico].recebido += a.valor;
+    else srvMap[a.servico].pendente += a.valor;
+  });
+  const sorted = Object.entries(srvMap).sort((a,b)=>b[1].recebido-a[1].recebido);
+  const maxRec = sorted.length ? Math.max(...sorted.map(([,d])=>d.recebido+d.pendente),1) : 1;
+  document.getElementById('r-by-service').innerHTML = sorted.length
+    ? '<div style="margin-top:6px">' + sorted.map(([s,d],i)=>`
+      <div style="padding:10px 0;border-bottom:${i<sorted.length-1?'1px solid var(--border)':'none'}">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div>
+            <div style="font-weight:700;font-size:14px">${servicoBadge(s)}</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:4px">${d.count} atend. · Recebido: ${R(d.recebido)} · Pendente: ${R(d.pendente)}</div>
+          </div>
+          <div style="text-align:right">
+            <div><span class="badge badge-green">${R(d.recebido)}</span></div>
+            ${d.pendente>0?`<div style="margin-top:3px"><span class="badge badge-rose">${R(d.pendente)} pend.</span></div>`:''}
+          </div>
+        </div>
+        <div class="prog-wrap"><div class="prog-bar" style="width:${((d.recebido)/(maxRec))*100}%"></div></div>
+      </div>`).join('') + '</div>'
+    : '<div class="empty-state">Sem dados</div>';
+
+  document.getElementById('r-list').innerHTML = agendamentos.length
+    ? [...agendamentos].reverse().map(a=>`<tr>
+        <td><strong>${a.cliente}</strong></td>
+        <td>${servicoBadge(a.servico)}</td>
+        <td style="font-size:12px;white-space:nowrap">${fmtDateTime(a.data,a.hora)}</td>
+        <td><span class="badge badge-amber">${R(a.valor)}</span></td>
+        <td>${pagBadge(a.paymentType)}</td>
+      </tr>`).join('')
+    : '<tr><td colspan="5"><div class="empty-state">Sem atendimentos</div></td></tr>';
+}
+
+// ══════════════════════════════════════════════════════
+//  RENDER CLIENTES
+// ══════════════════════════════════════════════════════
+function renderClientes() {
+  const clients   = getClients();
+  const container = document.getElementById('c-list');
+
+  if (!clients.length) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">👤</div>Nenhuma cliente registrada ainda.<br><span style="font-size:12px">Os perfis são criados automaticamente ao registrar atendimentos.</span></div>';
+    document.getElementById('c-total-clients').textContent = '0';
+    document.getElementById('c-top-client').textContent    = '—';
+    document.getElementById('c-top-client-val').textContent = '';
+    document.getElementById('c-fiado-clients').textContent  = '0';
+    return;
+  }
+
+  const sorted   = [...clients].sort((a,b)=>{
+    const sa=getClientStats(a), sb=getClientStats(b);
+    return (sb.totalGasto+sb.pendVal)-(sa.totalGasto+sa.pendVal);
+  });
+  const top    = sorted[0];
+  const topSt  = getClientStats(top);
+  const fiadoCl = clients.filter(c=>getClientStats(c).fiadosPend.length>0);
+
+  document.getElementById('c-total-clients').textContent   = clients.length;
+  document.getElementById('c-top-client').textContent      = top.name;
+  document.getElementById('c-top-client-val').textContent  = R(topSt.totalGasto+topSt.pendVal) + ' em serviços';
+  document.getElementById('c-fiado-clients').textContent   = fiadoCl.length;
+
+  container.innerHTML = sorted.map((client, idx) => {
+    const st       = getClientStats(client);
+    const initials = client.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    const hasPend  = st.fiadosPend.length > 0;
+    const fiadoBadge = hasPend
+      ? `<span class="badge badge-purple" style="font-size:11px">📒 ${R(st.pendVal)} pendente</span>`
+      : (st.fiadosPago.length>0 ? `<span class="badge badge-green" style="font-size:11px">✓ Sem pendências</span>` : '');
+
+    const srvCount = {};
+    client.atendimentos.forEach(a=>{ srvCount[a.servico]=(srvCount[a.servico]||0)+1; });
+    const srvList = Object.entries(srvCount).sort((a,b)=>b[1]-a[1])
+      .map(([s,c])=>`${servicoBadge(s)} <span style="font-size:11px;color:var(--text-muted)">${c}×</span>`).join(' ');
+
+    return `<div class="client-card" id="ccard-${idx}">
+      <div class="client-card-header" onclick="toggleClientCard(${idx})">
+        <div class="client-avatar">${initials}</div>
+        <div class="client-info">
+          <div class="client-name">${client.name} ${idx===0?'<span class="badge badge-gold" style="font-size:10px">⭐ Top</span>':''}</div>
+          <div class="client-meta">${client.atendimentos.length} atend. ${client.telefone?'· 📱 '+client.telefone:''} ${fiadoBadge?'· '+fiadoBadge:''}</div>
+        </div>
+        <div class="client-stats">
+          <div>
+            <div class="client-stat-val" style="color:var(--accent)">${R(st.totalGasto+st.pendVal)}</div>
+            <div class="client-stat-lbl">Total gasto</div>
+          </div>
+        </div>
+        <span class="client-expand">▶</span>
+      </div>
+      <div class="client-body">
+        ${srvList ? `<div style="margin:10px 0 6px;display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+          <span style="font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-dim);font-weight:700">Serviços:</span>
+          ${srvList}
+        </div>` : ''}
+        ${hasPend ? `
+        <div class="client-section-title">📒 Fiados Pendentes</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Serviço</th><th>Parcela</th><th>Valor</th><th>Vencimento</th><th>Status</th><th>Ação</th></tr></thead>
+          <tbody>${st.fiadosPend.map(f=>{
+            const ls = getFiadoStatus(f);
+            const sb2 = ls==='atrasado' ? '<span class="fiado-status-atrasado">⏰ Atrasado</span>' : '<span class="fiado-status-pendente">📒 Pendente</span>';
+            const pi  = f.isParcelado ? `<span class="installment-badge">📊 ${f.parcelaNum}ª/${f.totalParcelas}</span>` : '—';
+            return `<tr>
+              <td>${servicoBadge(f.servico)}</td>
+              <td>${pi}</td>
+              <td><span class="badge badge-purple">${R(f.value)}</span></td>
+              <td style="font-size:12px">${fmtDateOnly(f.dueDate)}</td>
+              <td>${sb2}</td>
+              <td><button class="btn-success" onclick="marcarPago(${f.id});renderAll()">✓ Pago</button></td>
+            </tr>`;
+          }).join('')}</tbody>
+        </table></div>` : ''}
+        <div class="client-section-title">🧾 Histórico de Atendimentos</div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Serviço</th><th>Data</th><th>Valor</th><th>Pagamento</th><th>Status</th></tr></thead>
+          <tbody>${client.atendimentos.map(a=>`<tr>
+            <td>${servicoBadge(a.servico)}</td>
+            <td style="font-size:12px;white-space:nowrap">${fmtDateTime(a.data,a.hora)}</td>
+            <td><span class="badge badge-amber">${R(a.valor)}</span></td>
+            <td>${pagBadge(a.paymentType)}</td>
+            <td>${statusAgBadge(a.status)}</td>
+          </tr>`).join('')}</tbody>
+        </table></div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);font-size:12px;color:var(--text-muted)">
+          <span>Total: <strong style="color:var(--accent)">${R(st.totalGasto+st.pendVal)}</strong></span>
+          <span>·</span>
+          <span>Recebido: <strong style="color:var(--green)">${R(st.totalGasto)}</strong></span>
+          ${hasPend?`<span>·</span><span>Pendente: <strong style="color:var(--purple)">${R(st.pendVal)}</strong></span>`:''}
+          ${st.fiadosPago.length>0?`<span>·</span><span>Fiado pago: <strong style="color:var(--green)">${R(st.pagoVal)}</strong></span>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleClientCard(idx) {
+  document.getElementById('ccard-'+idx).classList.toggle('open');
+}
+
+// ══════════════════════════════════════════════════════
+//  RENDER ALL
+// ══════════════════════════════════════════════════════
+function renderAll() {
+  renderDashboard();
+  renderAgendamentos();
+  renderFiado();
+  renderRelatorios();
+  renderClientes();
+}
+
+// ══════════════════════════════════════════════════════
+//  CALCULADORA
+// ══════════════════════════════════════════════════════
+let calcCurrent = '0', calcPrev = '', calcOper = null, calcReset = false;
+function toggleCalc() { document.getElementById('calc-overlay').classList.toggle('open'); }
+function closeCalcOutside(e) { if (e.target===document.getElementById('calc-overlay')) toggleCalc(); }
+function updateCalcScreen() {
+  document.getElementById('calc-val').textContent  = calcCurrent;
+  document.getElementById('calc-expr').textContent = calcOper ? calcPrev+' '+calcOper : '';
+}
+function calcNum(n) {
+  if (calcReset) { calcCurrent=n; calcReset=false; }
+  else calcCurrent = calcCurrent==='0' ? n : calcCurrent+n;
+  if (calcCurrent.length>12) calcCurrent=calcCurrent.slice(0,-1);
+  updateCalcScreen();
+}
+function calcDot() {
+  if (calcReset) { calcCurrent='0.'; calcReset=false; updateCalcScreen(); return; }
+  if (!calcCurrent.includes('.')) { calcCurrent+='.'; updateCalcScreen(); }
+}
+function calcOp(op) {
+  if (calcOper && !calcReset) calcEquals();
+  calcPrev=calcCurrent; calcOper=op; calcReset=true; updateCalcScreen();
+}
+function calcEquals() {
+  if (!calcOper||calcReset) return;
+  const a=parseFloat(calcPrev), b=parseFloat(calcCurrent);
+  let res;
+  if (calcOper==='+') res=a+b; else if (calcOper==='-') res=a-b;
+  else if (calcOper==='*') res=a*b; else if (calcOper==='/') res=b!==0?a/b:'Erro';
+  calcCurrent = typeof res==='number' ? parseFloat(res.toFixed(10)).toString() : res;
+  calcOper=null; calcPrev=''; calcReset=true; updateCalcScreen();
+}
+function calcAC()      { calcCurrent='0'; calcPrev=''; calcOper=null; calcReset=false; updateCalcScreen(); }
+function calcSign()    { calcCurrent=String(parseFloat(calcCurrent)*-1); updateCalcScreen(); }
+function calcPercent() { calcCurrent=String(parseFloat(calcCurrent)/100); updateCalcScreen(); }
+
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('calc-overlay').classList.contains('open')) return;
+  if (e.key>='0'&&e.key<='9') calcNum(e.key);
+  else if (e.key==='.') calcDot();
+  else if (e.key==='+') calcOp('+'); else if (e.key==='-') calcOp('-');
+  else if (e.key==='*') calcOp('*');
+  else if (e.key==='/') { e.preventDefault(); calcOp('/'); }
+  else if (e.key==='Enter'||e.key==='=') calcEquals();
+  else if (e.key==='Escape') toggleCalc();
+  else if (e.key==='Backspace') { calcCurrent=calcCurrent.length>1?calcCurrent.slice(0,-1):'0'; updateCalcScreen(); }
+});
+
+// ══════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════
+renderAll();
+</script>
+</body>
+</html>
